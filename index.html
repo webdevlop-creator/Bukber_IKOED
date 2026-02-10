@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Undangan Bukber IKOED</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
+body{background:#0f1720;color:white;overflow-x:hidden}
+
+/* OPENING */
+#opening{
+height:100vh;
+background:url('ikoed.jpeg') center/cover no-repeat;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+position:fixed;
+width:100%;
+z-index:99;
+transition:1.2s;
+}
+#opening h1{font-family:Cinzel;font-size:34px;margin-bottom:10px}
+#opening button{
+margin-top:30px;
+padding:14px 32px;
+background:#c8a96a;
+color:#000;
+border:none;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;
+}
+
+/* CONTENT */
+.section{
+padding:90px 20px;
+text-align:center;
+background:
+linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)),
+url('bg2.jpeg') center/cover;
+}
+
+h2{
+font-family:Cinzel;
+color:#f5d27a;
+margin-bottom:20px;
+}
+
+.countdown{display:flex;justify-content:center;gap:12px;margin-top:20px}
+.box{background:#c8a96a;color:#000;padding:12px 16px;border-radius:8px}
+
+input,select{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:6px;
+border:none;
+}
+
+button.absen{
+background:#c8a96a;
+color:#000;
+padding:12px;
+border:none;
+border-radius:6px;
+width:100%;
+margin-top:10px;
+}
+
+.map iframe{width:100%;height:300px;border:0;border-radius:10px}
+
+.gallery img{
+width:100%;
+border-radius:10px;
+margin-top:10px;
+}
+
+.hide{display:none}
+</style>
+</head>
+<body>
+
+<!-- OPENING -->
+<div id="opening">
+  <h1>Undangan Bukber IKOED</h1>
+  <p>Ikatan Alumni Mas Tgk. Chiek Oemar Diyan</p>
+  <button onclick="buka()">Buka Undangan</button>
+</div>
+
+<!-- SALAM -->
+<div class="section">
+  <h2>Assalamu'alaikum Wr. Wb</h2>
+  <p>Dalam rangka mempererat tali silaturahmi, maka kami</p>
+  <p>mengundang seluruh keluarga besar Oemar Diyan untuk hadir</p>
+  <p>dalam acara buka bersama IKOED</p>
+</div>
+
+<!-- SUSUNAN ACARA -->
+<div class="section">
+  <h2>Susunan Acara</h2>
+  <p>>  Sharing session</p>
+  <P>>  Pembukaan oleh MC</P>
+  <p>>  Pembacaan ayat suci Al-qur'an</p>
+  <p>>  Kata-kata sambutan</p>
+  <p>>  Santunan anak yatim</p>
+  <p>>  Doa</p>
+  <p>>  Berbuka</p>
+  <p>>  Sholat</p>
+  <p>>  Makan</p>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="section">
+  <h2>Menuju Hari H</h2>
+  <div class="countdown">
+    <div class="box"><span id="h"></span> Hari</div>
+    <div class="box"><span id="j"></span> Jam</div>
+    <div class="box"><span id="m"></span> Menit</div>
+    <div class="box"><span id="d"></span> Detik</div>
+  </div>
+</div>
+
+<!-- MAPS -->
+<div class="section">
+  <h2>Lokasi Acara</h2>
+  <div class="map">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248.25774467409346!2d95.43437511656666!3d5.398084684035918!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3040404ce6c22577%3A0x9b94c9e20a5ec9ce!2s9CXM%2B7Q2%2C%20Reukih%20Dayah%2C%20Kec.%20Indrapuri%2C%20Kabupaten%20Aceh%20Besar%2C%20Aceh%2023373!5e0!3m2!1sid!2sid!4v1770739548127!5m2!1sid!2sid"></iframe>
+  </div>
+</div>
+
+<!-- GALERI -->
+<div class="section gallery">
+  <h2>Galeri Bukber</h2>
+  <img src="ikoed2.jpeg">
+  <img src="ikoed3.jpeg">
+</div>
+
+<!-- RSVP -->
+<div class="section">
+  <h2>Konfirmasi Kehadiran</h2>
+
+  <input type="text" id="nama" placeholder="Nama Lengkap">
+
+  <select id="angkatan">
+    <option value="">Pilih Angkatan</option>
+  </select>
+
+  <select id="status" onchange="munculKeluarga()">
+    <option value="">Datang Sebagai</option>
+    <option value="sendiri">Sendiri</option>
+    <option value="keluarga">Bersama Keluarga</option>
+  </select>
+
+  <input type="number" id="jumlah" class="hide" placeholder="Jumlah Keluarga Dibawa">
+
+  <button class="absen" onclick="kirim()">Kirim Absensi</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getDatabase, ref, push, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA-3KRZIlqWWIriG69k870i_s0p3Fb1vrY",
+  authDomain: "bukber-ikoed.firebaseapp.com",
+  databaseURL: "https://bukber-ikoed-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "bukber-ikoed",
+  storageBucket: "bukber-ikoed.firebasestorage.app",
+  messagingSenderId: "1048793981361",
+  appId: "1:1048793981361:web:3688383e06cd8418875d90",
+  measurementId: "G-ZWWY9N9C20"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* ANGKATAN AUTO */
+const select = document.getElementById("angkatan");
+for(let i=2026;i>=2010;i--){
+  let opt=document.createElement("option");
+  opt.value=i;
+  opt.text=i;
+  select.add(opt);
+}
+let opt=document.createElement("option");
+opt.value="1990-2009";
+opt.text="Gabungan Alumni 1990-2009";
+select.add(opt);
+
+/* SHOW INPUT KELUARGA */
+window.munculKeluarga=function(){
+  const s=document.getElementById("status").value;
+  document.getElementById("jumlah").classList.toggle("hide", s!=="keluarga");
+}
+
+/* KIRIM */
+window.kirim=function(){
+  const nama=nama.value;
+  const angkatan=angkatan.value;
+  const status=status.value;
+  const jumlah=status==="keluarga"?parseInt(jumlah.value):1;
+
+  const data={
+    nama,angkatan,status,jumlah,
+    waktu:new Date().toLocaleString()
+  };
+
+  push(ref(db,'absensi/'+angkatan),data);
+
+  update(ref(db,'rekap/'+angkatan),{
+    total: jumlah
+  });
+
+  alert("Absensi terkirim");
+}
+
+/* OPENING */
+window.buka=function(){
+  document.getElementById("opening").style.opacity=0;
+  setTimeout(()=>{opening.style.display="none"},1200);
+}
+
+/* COUNTDOWN */
+const target=new Date("March 7, 2026 18:50:00").getTime();
+setInterval(()=>{
+  const now=new Date().getTime();
+  const s=target-now;
+  h.innerText=Math.floor(s/86400000);
+  j.innerText=Math.floor((s%86400000)/3600000);
+  m.innerText=Math.floor((s%3600000)/60000);
+  d.innerText=Math.floor((s%60000)/1000);
+},1000);
+</script>
+
+</body>
+</html>
